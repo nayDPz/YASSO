@@ -1,8 +1,8 @@
-﻿using HenryMod.SkillStates.BaseStates;
+﻿using YassoMod.SkillStates.BaseStates;
 using RoR2;
 using UnityEngine;
 
-namespace HenryMod.SkillStates
+namespace YassoMod.SkillStates
 {
     public class SlashCombo : BaseMeleeAttack
     {
@@ -16,6 +16,7 @@ namespace HenryMod.SkillStates
             this.pushForce = 300f;
             this.bonusForce = Vector3.zero;
             this.baseDuration = 1f;
+            this.damageCoefficient = 2f;
             this.attackStartTime = 0.2f;
             this.attackEndTime = 0.4f;
             this.baseEarlyExitTime = 0.4f;
@@ -23,13 +24,13 @@ namespace HenryMod.SkillStates
             this.attackRecoil = 0.5f;
             this.hitHopVelocity = 4f;
 
-            this.swingSoundString = "HenrySwordSwing";
+            this.swingSoundString = "YasuoAutoAttack";
             this.hitSoundString = "";
-            this.muzzleString = swingIndex % 2 == 0 ? "SwingLeft" : "SwingRight";
+            this.muzzleString = swingIndex % 2 == 0 ? "SwingRight" : "SwingLeft";
             this.swingEffectPrefab = Modules.Assets.swordSwingEffect;
-            this.hitEffectPrefab = Modules.Assets.swordHitImpactEffect;
+            this.hitEffectPrefab = Modules.Assets.autoHitImpactEffect;
 
-            this.impactSound = Modules.Assets.swordHitSoundEvent.index;
+            this.impactSound = Modules.Assets.autoHitSoundEvent.index;
 
             base.OnEnter();
         }

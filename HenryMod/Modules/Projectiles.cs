@@ -4,7 +4,7 @@ using RoR2.Projectile;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     internal static class Projectiles
     {
@@ -12,6 +12,7 @@ namespace HenryMod.Modules
 
         internal static void RegisterProjectiles()
         {
+            // only separating into separate methods for my sanity
             CreateBomb();
 
             AddProjectile(bombPrefab);
@@ -24,45 +25,43 @@ namespace HenryMod.Modules
 
         private static void CreateBomb()
         {
-            bombPrefab = CloneProjectilePrefab("CommandoGrenadeProjectile", "HenryBombProjectile");
+            bombPrefab = CloneProjectilePrefab("Fireball", "YassoTornadoProjectile");
 
-            ProjectileImpactExplosion bombImpactExplosion = bombPrefab.GetComponent<ProjectileImpactExplosion>();
-            InitializeImpactExplosion(bombImpactExplosion);
+            bombPrefab.transform.localScale = new Vector3(1, 1, 1);
+            GameObject.Destroy(bombPrefab.GetComponent<SphereCollider>());
+            GameObject.Destroy(bombPrefab.GetComponent<ProjectileSingleTargetImpact>());
 
-            bombImpactExplosion.blastRadius = 16f;
-            bombImpactExplosion.destroyOnEnemy = true;
-            bombImpactExplosion.lifetime = 12f;
-            bombImpactExplosion.impactEffect = Modules.Assets.bombExplosionEffect;
-            //bombImpactExplosion.lifetimeExpiredSound = Modules.Assets.CreateNetworkSoundEventDef("HenryBombExplosion");
-            bombImpactExplosion.timerAfterImpact = true;
-            bombImpactExplosion.lifetimeAfterImpact = 0.1f;
+            ProjectileSimple s = bombPrefab.GetComponent<ProjectileSimple>();
+            s.lifetime = 1.25f;
+            s.desiredForwardSpeed = 50f;
+            s.enableVelocityOverLifetime = true;
+            s.velocityOverLifetime = new AnimationCurve(new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(0.85f, 0.1f), new Keyframe(1f, 0f) });
+
+            ProjectileDamage d = bombPrefab.GetComponent<ProjectileDamage>();
+            d.damageType = DamageType.ApplyMercExpose;
+
+            GameObject hitbox = new GameObject("hitbox");
+            hitbox.transform.parent = bombPrefab.transform;
+            hitbox.transform.localScale = new Vector3(13f, 13f, 13f);
+            hitbox.transform.localPosition = new Vector3(0, 0f, 0);
+
+            HitBox[] hbs = new HitBox[] { hitbox.AddComponent<HitBox>() };
+            bombPrefab.AddComponent<HitBoxGroup>().hitBoxes = hbs;
+            ProjectileOverlapAttack o = bombPrefab.AddComponent<ProjectileOverlapAttack>();
+            o.damageCoefficient = 1f;
+            o.forceVector = Vector3.up * 3000f;
+
+
+            o.impactEffect = Modules.Assets.tornadoImpactEffect;
 
             ProjectileController bombController = bombPrefab.GetComponent<ProjectileController>();
-            if (Modules.Assets.mainAssetBundle.LoadAsset<GameObject>("HenryBombGhost") != null) bombController.ghostPrefab = CreateGhostPrefab("HenryBombGhost");
-            bombController.startSound = "";
-        }
+            if (Modules.Assets.mainAssetBundle.LoadAsset<GameObject>("FUCKINGEGG") != null) bombController.ghostPrefab = CreateGhostPrefab("FUCKINGEGG");
+            bombController.startSound = "YasuoTornadoStart";
 
-        private static void InitializeImpactExplosion(ProjectileImpactExplosion projectileImpactExplosion)
-        {
-            projectileImpactExplosion.blastDamageCoefficient = 1f;
-            projectileImpactExplosion.blastProcCoefficient = 1f;
-            projectileImpactExplosion.blastRadius = 1f;
-            projectileImpactExplosion.bonusBlastForce = Vector3.zero;
-            projectileImpactExplosion.childrenCount = 0;
-            projectileImpactExplosion.childrenDamageCoefficient = 0f;
-            projectileImpactExplosion.childrenProjectilePrefab = null;
-            projectileImpactExplosion.destroyOnEnemy = false;
-            projectileImpactExplosion.destroyOnWorld = false;
-            projectileImpactExplosion.falloffModel = RoR2.BlastAttack.FalloffModel.None;
-            projectileImpactExplosion.fireChildren = false;
-            projectileImpactExplosion.impactEffect = null;
-            projectileImpactExplosion.lifetime = 0f;
-            projectileImpactExplosion.lifetimeAfterImpact = 0f;
-            projectileImpactExplosion.lifetimeRandomOffset = 0f;
-            projectileImpactExplosion.offsetForLifetimeExpiredSound = 0f;
-            projectileImpactExplosion.timerAfterImpact = false;
+            bombController.ghostPrefab.GetComponent<Renderer>().material = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<Material>("RoR2/Base/Merc/matMercSwipe2.mat").WaitForCompletion();
+            GameObject.Destroy(bombController.ghostPrefab.GetComponent<SphereCollider>());
 
-            projectileImpactExplosion.GetComponent<ProjectileDamage>().damageType = DamageType.Generic;
+            
         }
 
         private static GameObject CreateGhostPrefab(string ghostName)
@@ -78,7 +77,7 @@ namespace HenryMod.Modules
 
         private static GameObject CloneProjectilePrefab(string prefabName, string newPrefabName)
         {
-            GameObject newPrefab = PrefabAPI.InstantiateClone(RoR2.LegacyResourcesAPI.Load<GameObject>("Prefabs/Projectiles/" + prefabName), newPrefabName);
+            GameObject newPrefab = PrefabAPI.InstantiateClone(LegacyResourcesAPI.Load<GameObject>("Prefabs/Projectiles/" + prefabName), newPrefabName);
             return newPrefab;
         }
     }

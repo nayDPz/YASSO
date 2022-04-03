@@ -1,36 +1,36 @@
 ﻿using BepInEx.Configuration;
-using HenryMod.Modules.Characters;
+using YassoMod.Modules.Characters;
 using RoR2;
 using RoR2.Skills;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HenryMod.Modules.Survivors
+namespace YassoMod.Modules.Survivors
 {
     internal class MyCharacter : SurvivorBase
     {
-        public override string bodyName => "Henry";
+        public override string bodyName => "Yasuo";
 
-        public const string HENRY_PREFIX = HenryPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_";
+        public const string HENRY_PREFIX = YassoPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_";
         //used when registering your survivor's language tokens
         public override string survivorTokenPrefix => HENRY_PREFIX;
 
         public override BodyInfo bodyInfo { get; set; } = new BodyInfo
         {
-            bodyName = "HenryBody",
-            bodyNameToken = HenryPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_NAME",
-            subtitleNameToken = HenryPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_SUBTITLE",
+            bodyName = "YasuoBody",
+            bodyNameToken = YassoPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_NAME",
+            subtitleNameToken = YassoPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_SUBTITLE",
 
-            characterPortrait = Assets.mainAssetBundle.LoadAsset<Texture>("texHenryIcon"),
-            bodyColor = Color.white,
+            characterPortrait = Assets.mainAssetBundle.LoadAsset<Texture>("texYassoIcon"),
+            bodyColor = Color.blue,
 
             crosshair = Modules.Assets.LoadCrosshair("Standard"),
             podPrefab = RoR2.LegacyResourcesAPI.Load<GameObject>("Prefabs/NetworkedObjects/SurvivorPod"),
 
             maxHealth = 110f,
             healthRegen = 1.5f,
-            armor = 0f,
+            armor = 15f,
 
             jumpCount = 1,
         };
@@ -39,17 +39,9 @@ namespace HenryMod.Modules.Survivors
         {
                 new CustomRendererInfo
                 {
-                    childName = "SwordModel",
-                    material = Materials.CreateHopooMaterial("matHenry"),
+                    childName = "Mesh",
+                    material = Materials.CreateHopooMaterial("matYAZZO"),
                 },
-                new CustomRendererInfo
-                {
-                    childName = "GunModel",
-                },
-                new CustomRendererInfo
-                {
-                    childName = "Model",
-                }
         };
 
         public override UnlockableDef characterUnlockableDef => null;
@@ -66,6 +58,7 @@ namespace HenryMod.Modules.Survivors
         public override void InitializeCharacter()
         {
             base.InitializeCharacter();
+            Modules.Components.YassoTracker t = bodyPrefab.AddComponent<Components.YassoTracker>();
         }
 
         public override void InitializeUnlockables()
@@ -79,21 +72,22 @@ namespace HenryMod.Modules.Survivors
             ChildLocator childLocator = bodyPrefab.GetComponentInChildren<ChildLocator>();
             GameObject model = childLocator.gameObject;
 
-            //example of how to create a hitbox
-            //Transform hitboxTransform = childLocator.FindChild("SwordHitbox");
-            //Modules.Prefabs.SetupHitbox(model, hitboxTransform, "Sword");
+            Transform hitboxTransform = childLocator.FindChild("SwordHitbox");
+            Modules.Prefabs.SetupHitbox(model, hitboxTransform, "Sword");
+            hitboxTransform = childLocator.FindChild("SpinHitbox");
+            Modules.Prefabs.SetupHitbox(model, hitboxTransform, "Spin");
         }
 
         public override void InitializeSkills()
         {
             Modules.Skills.CreateSkillFamilies(bodyPrefab);
-            string prefix = HenryPlugin.DEVELOPER_PREFIX;
+            string prefix = YassoPlugin.DEVELOPER_PREFIX;
 
             #region Primary
             //Creates a skilldef for a typical primary 
             SkillDef primarySkillDef = Modules.Skills.CreateSkillDef(new SkillDefInfo(prefix + "_HENRY_BODY_PRIMARY_SLASH_NAME",
                                                                                       prefix + "_HENRY_BODY_PRIMARY_SLASH_DESCRIPTION",
-                                                                                      Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("texPrimaryIcon"),
+                                                                                      Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("skill0"),
                                                                                       new EntityStates.SerializableEntityStateType(typeof(SkillStates.SlashCombo)),
                                                                                       "Weapon",
                                                                                       true));
@@ -103,17 +97,17 @@ namespace HenryMod.Modules.Survivors
             #endregion
 
             #region Secondary
-            SkillDef shootSkillDef = Modules.Skills.CreateSkillDef(new SkillDefInfo
+            Modules.Components.ASpdCdSkillDef shootSkillDef = Modules.Skills.CreateSkillDef<Modules.Components.ASpdCdSkillDef>(new SkillDefInfo
             {
                 skillName = prefix + "_HENRY_BODY_SECONDARY_GUN_NAME",
                 skillNameToken = prefix + "_HENRY_BODY_SECONDARY_GUN_NAME",
                 skillDescriptionToken = prefix + "_HENRY_BODY_SECONDARY_GUN_DESCRIPTION",
-                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Shoot)),
-                activationStateMachineName = "Slide",
+                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("skill1"),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Henry.EnterSecondary)),
+                activationStateMachineName = "Weapon",
                 baseMaxStock = 1,
-                baseRechargeInterval = 1f,
-                beginSkillCooldownOnSkillEnd = false,
+                baseRechargeInterval = 4f,
+                beginSkillCooldownOnSkillEnd = true,
                 canceledFromSprinting = false,
                 forceSprintDuringState = false,
                 fullRestockOnAssign = true,
@@ -132,16 +126,16 @@ namespace HenryMod.Modules.Survivors
             #endregion
 
             #region Utility
-            SkillDef rollSkillDef = Modules.Skills.CreateSkillDef(new SkillDefInfo
+            Components.DashTrackerSkillDef rollSkillDef = Modules.Skills.CreateSkillDef<Components.DashTrackerSkillDef>(new SkillDefInfo
             {
                 skillName = prefix + "_HENRY_BODY_UTILITY_ROLL_NAME",
                 skillNameToken = prefix + "_HENRY_BODY_UTILITY_ROLL_NAME",
                 skillDescriptionToken = prefix + "_HENRY_BODY_UTILITY_ROLL_DESCRIPTION",
-                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("texUtilityIcon"),
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Roll)),
+                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("skill2"),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Dash)),
                 activationStateMachineName = "Body",
                 baseMaxStock = 1,
-                baseRechargeInterval = 4f,
+                baseRechargeInterval = 1f,
                 beginSkillCooldownOnSkillEnd = false,
                 canceledFromSprinting = false,
                 forceSprintDuringState = true,
@@ -160,21 +154,21 @@ namespace HenryMod.Modules.Survivors
             #endregion
 
             #region Special
-            SkillDef bombSkillDef = Modules.Skills.CreateSkillDef(new SkillDefInfo
+            Components.ExposeTrackerSkillDef bombSkillDef = Modules.Skills.CreateSkillDef< Components.ExposeTrackerSkillDef>(new SkillDefInfo
             {
                 skillName = prefix + "_HENRY_BODY_SPECIAL_BOMB_NAME",
                 skillNameToken = prefix + "_HENRY_BODY_SPECIAL_BOMB_NAME",
                 skillDescriptionToken = prefix + "_HENRY_BODY_SPECIAL_BOMB_DESCRIPTION",
-                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("texSpecialIcon"),
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.ThrowBomb)),
-                activationStateMachineName = "Slide",
+                skillIcon = Modules.Assets.mainAssetBundle.LoadAsset<Sprite>("skill4"),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.DashUlt)),
+                activationStateMachineName = "Body",
                 baseMaxStock = 1,
-                baseRechargeInterval = 10f,
+                baseRechargeInterval = 9f,
                 beginSkillCooldownOnSkillEnd = false,
                 canceledFromSprinting = false,
                 forceSprintDuringState = false,
                 fullRestockOnAssign = true,
-                interruptPriority = EntityStates.InterruptPriority.Skill,
+                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
                 resetCooldownTimerOnUse = false,
                 isCombatSkill = true,
                 mustKeyPress = false,
@@ -203,7 +197,7 @@ namespace HenryMod.Modules.Survivors
             List<SkinDef> skins = new List<SkinDef>();
 
             #region DefaultSkin
-            SkinDef defaultSkin = Modules.Skins.CreateSkinDef(HenryPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_DEFAULT_SKIN_NAME",
+            SkinDef defaultSkin = Modules.Skins.CreateSkinDef(YassoPlugin.DEVELOPER_PREFIX + "_HENRY_BODY_DEFAULT_SKIN_NAME",
                 Assets.mainAssetBundle.LoadAsset<Sprite>("texMainSkin"),
                 defaultRenderers,
                 mainRenderer,
@@ -211,13 +205,11 @@ namespace HenryMod.Modules.Survivors
 
             defaultSkin.meshReplacements = new SkinDef.MeshReplacement[]
             {
-                //place your mesh replacements here
-                //unnecessary if you don't have multiple skins
-                //new SkinDef.MeshReplacement
-                //{
-                //    mesh = Modules.Assets.mainAssetBundle.LoadAsset<Mesh>("meshHenrySword"),
-                //    renderer = defaultRenderers[0].renderer
-                //},
+                new SkinDef.MeshReplacement
+                {
+                    mesh = Modules.Assets.mainAssetBundle.LoadAsset<Mesh>("meshYESHOUZ"),
+                    renderer = defaultRenderers[0].renderer
+                },
                 //new SkinDef.MeshReplacement
                 //{
                 //    mesh = Modules.Assets.mainAssetBundle.LoadAsset<Mesh>("meshHenryGun"),

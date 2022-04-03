@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     internal static class Skins
     {

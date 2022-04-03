@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using RoR2.UI;
 using System;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     internal static class Assets
     {
@@ -17,12 +17,17 @@ namespace HenryMod.Modules
 
         // particle effects
         internal static GameObject swordSwingEffect;
-        internal static GameObject swordHitImpactEffect;
+        internal static GameObject autoHitImpactEffect;
+        internal static GameObject tornadoImpactEffect;
+
 
         internal static GameObject bombExplosionEffect;
 
         // networked hit sounds
-        internal static NetworkSoundEventDef swordHitSoundEvent;
+        internal static NetworkSoundEventDef autoHitSoundEvent;
+        internal static NetworkSoundEventDef qHitSoundEvent;
+        internal static NetworkSoundEventDef eqHitSoundEvent;
+        internal static NetworkSoundEventDef dashHitSoundEvent;
 
         // cache these and use to create our own materials
         internal static Shader hotpoo = RoR2.LegacyResourcesAPI.Load<Shader>("Shaders/Deferred/HGStandard");
@@ -30,17 +35,12 @@ namespace HenryMod.Modules
         private static string[] assetNames = new string[0];
 
         // CHANGE THIS
-        private const string assetbundleName = "myassetbundle";
+        private const string assetbundleName = "yibblyassets";
         //change this to your project's name if/when you've renamed it
-        private const string csProjName = "HenryMod.";
+        private const string csProjName = "YassoMod.";
 
         internal static void Initialize()
         {
-            if (assetbundleName == "myassetbundle")
-            {
-                Log.Error("AssetBundle name hasn't been changed. not loading any assets to avoid conflicts");
-                return;
-            }
 
             LoadAssetBundle();
             LoadSoundbank();
@@ -51,7 +51,7 @@ namespace HenryMod.Modules
         {
             if (mainAssetBundle == null)
             {                                                                                     
-                using (var assetStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{csProjName}.{assetbundleName}"))
+                using (var assetStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("YassoMod.yasuoassets"))
                 {
                     mainAssetBundle = AssetBundle.LoadFromStream(assetStream);
                 }
@@ -68,7 +68,7 @@ namespace HenryMod.Modules
 
         internal static void LoadSoundbank()
         {                                                                                                   
-            using (Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{csProjName}.HenryBank.bnk"))
+            using (Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream("YassoMod.YASSOOOOOOOOOOBANK.bnk"))
             {
                 byte[] array = new byte[manifestResourceStream2.Length];
                 manifestResourceStream2.Read(array, 0, array.Length);
@@ -87,7 +87,10 @@ namespace HenryMod.Modules
             // feel free to delete everything in here and load in your own assets instead
             // it should work fine even if left as is- even if the assets aren't in the bundle
 
-            swordHitSoundEvent = CreateNetworkSoundEventDef("HenrySwordHit");
+            autoHitSoundEvent = CreateNetworkSoundEventDef("YasuoAutoHit");
+            qHitSoundEvent = CreateNetworkSoundEventDef("YasuoQHit");
+            eqHitSoundEvent = CreateNetworkSoundEventDef("YasuoEQHit");
+            dashHitSoundEvent = CreateNetworkSoundEventDef("YasuoDashHit");
 
             bombExplosionEffect = LoadEffect("BombExplosionEffect", "HenryBombExplosion");
 
@@ -108,7 +111,8 @@ namespace HenryMod.Modules
             }
 
             swordSwingEffect = Assets.LoadEffect("HenrySwordSwingEffect", true);
-            swordHitImpactEffect = Assets.LoadEffect("ImpactHenrySlash");
+            autoHitImpactEffect = Assets.LoadEffect("ImpactHenrySlash");
+            tornadoImpactEffect = Assets.LoadEffect("ImpactHenrySlash2", "YasuoTornadoHit");
         }
 
         private static GameObject CreateTracer(string originalTracerName, string newTracerName)
@@ -241,12 +245,12 @@ namespace HenryMod.Modules
             return newEffect;
         }
 
-        private static void AddNewEffectDef(GameObject effectPrefab)
+        public static void AddNewEffectDef(GameObject effectPrefab)
         {
             AddNewEffectDef(effectPrefab, "");
         }
 
-        private static void AddNewEffectDef(GameObject effectPrefab, string soundName)
+        public static void AddNewEffectDef(GameObject effectPrefab, string soundName)
         {
             EffectDef newEffectDef = new EffectDef();
             newEffectDef.prefab = effectPrefab;

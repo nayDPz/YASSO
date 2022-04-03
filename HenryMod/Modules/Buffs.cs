@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     public static class Buffs
     {
         // armor buff gained during roll
-        internal static BuffDef armorBuff;
-
+        internal static BuffDef qStackBuff;
+        internal static BuffDef dashCooldownBuff;
         internal static void RegisterBuffs()
         {
-            armorBuff = AddNewBuff("HenryArmorBuff", RoR2.LegacyResourcesAPI.Load<Sprite>("Textures/BuffIcons/texBuffGenericShield"), Color.white, false, false);
+            qStackBuff = AddNewBuff("YasuoQStack", RoR2.LegacyResourcesAPI.Load<Sprite>("Textures/BuffIcons/texBuffGenericShield"), Color.white, true, false);
+            dashCooldownBuff = AddNewBuff("DashCooldown", RoR2.LegacyResourcesAPI.Load<Sprite>("Textures/BuffIcons/texBuffGenericShield"), Color.white, false, false);
         }
 
         // simple helper method

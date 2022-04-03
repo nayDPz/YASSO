@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace HenryMod.SkillStates.BaseStates
+namespace YassoMod.SkillStates.BaseStates
 {
     public class BaseMeleeAttack : BaseSkillState
     {
@@ -25,7 +25,7 @@ namespace HenryMod.SkillStates.BaseStates
         protected float hitStopDuration = 0.012f;
         protected float attackRecoil = 0.75f;
         protected float hitHopVelocity = 4f;
-        protected bool cancelled = false;
+        protected bool bufferExit = false;
 
         protected string swingSoundString = "";
         protected string hitSoundString = "";
@@ -54,8 +54,6 @@ namespace HenryMod.SkillStates.BaseStates
             this.hasFired = false;
             this.animator = base.GetModelAnimator();
             base.StartAimMode(0.5f + this.duration, false);
-            base.characterBody.outOfCombatStopwatch = 0f;
-            this.animator.SetBool("attacking", true);
 
             HitBoxGroup hitBoxGroup = null;
             Transform modelTransform = base.GetModelTransform();
@@ -84,12 +82,12 @@ namespace HenryMod.SkillStates.BaseStates
 
         protected virtual void PlayAttackAnimation()
         {
-            base.PlayCrossfade("Gesture, Override", "Slash" + (1 + swingIndex), "Slash.playbackRate", this.duration, 0.05f);
+            base.PlayCrossfade("FullBody, Override", "Slash" + (1 + swingIndex), "Slash.playbackRate", this.duration, 0.05f);
         }
 
         public override void OnExit()
         {
-            if (!this.hasFired && !this.cancelled) this.FireAttack();
+            if (!this.hasFired && this.bufferExit) this.FireAttack();
 
             base.OnExit();
 

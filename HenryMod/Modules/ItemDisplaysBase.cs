@@ -1,7 +1,7 @@
 ﻿using RoR2;
 using System.Collections.Generic;
 
-namespace HenryMod.Modules.Characters {
+namespace YassoMod.Modules.Characters {
     public abstract class ItemDisplaysBase {
         /// <summary>
         /// override and set to true to print in the console any item displays you haven't set on your character

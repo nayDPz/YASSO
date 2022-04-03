@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     internal static class StaticValues
     {

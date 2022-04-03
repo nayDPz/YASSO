@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     public abstract class GenericModdedUnlockable : ModdedUnlockable
     {

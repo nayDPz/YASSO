@@ -1,12 +1,12 @@
 ﻿using BepInEx.Configuration;
 using RoR2;
 using System;
-using HenryMod.Modules.Characters;
+using YassoMod.Modules.Characters;
 using UnityEngine;
 using System.Collections.Generic;
 using RoR2.Skills;
 
-namespace HenryMod.Modules.Survivors
+namespace YassoMod.Modules.Survivors
 {
     internal abstract class SurvivorBase : CharacterBase
     {
@@ -44,7 +44,7 @@ namespace HenryMod.Modules.Survivors
 
         protected virtual void InitializeDisplayPrefab()
         {
-            displayPrefab = Modules.Prefabs.CreateDisplayPrefab(bodyName + "Display", bodyPrefab, bodyInfo);
+            displayPrefab = Modules.Prefabs.CreateDisplayPrefab("mdl" + bodyName, bodyPrefab, bodyInfo);
         }
         public virtual void InitializeUnlockables()
         {

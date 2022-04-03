@@ -1,9 +1,9 @@
-﻿using HenryMod.SkillStates;
-using HenryMod.SkillStates.BaseStates;
+﻿using YassoMod.SkillStates;
+using YassoMod.SkillStates.BaseStates;
 using System.Collections.Generic;
 using System;
 
-namespace HenryMod.Modules
+namespace YassoMod.Modules
 {
     public static class States
     {
@@ -12,11 +12,13 @@ namespace HenryMod.Modules
             Modules.Content.AddEntityState(typeof(BaseMeleeAttack));
             Modules.Content.AddEntityState(typeof(SlashCombo));
 
-            Modules.Content.AddEntityState(typeof(Shoot));
 
-            Modules.Content.AddEntityState(typeof(Roll));
+            Modules.Content.AddEntityState(typeof(SkillStates.Henry.EnterSecondary));
+            Modules.Content.AddEntityState(typeof(Secondary1));
 
-            Modules.Content.AddEntityState(typeof(ThrowBomb));
+            Modules.Content.AddEntityState(typeof(Dash));
+
+            Modules.Content.AddEntityState(typeof(Secondary3));
         }
     }
 }
